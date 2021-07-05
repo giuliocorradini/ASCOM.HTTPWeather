@@ -41,6 +41,7 @@ namespace ASCOM
             // TODO add more code to test the driver.
             device.Connected = true;
 
+            Console.WriteLine($"Connection status {device.Connected}");
 
             device.Connected = false;
             Console.WriteLine("Press Enter to finish");

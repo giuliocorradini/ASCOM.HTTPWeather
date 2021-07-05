@@ -35,7 +35,7 @@ namespace ASCOM.HTTPWeather
             this.picASCOM = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.chkTrace = new System.Windows.Forms.CheckBox();
-            this.comboBoxComPort = new System.Windows.Forms.ComboBox();
+            this.comboBoxLastServer = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.SuspendLayout();
             // 
@@ -67,9 +67,9 @@ namespace ASCOM.HTTPWeather
             // 
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(123, 31);
+            this.label1.Size = new System.Drawing.Size(255, 31);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Construct your driver\'s setup dialog here.";
+            this.label1.Text = "Connect to remote weather station or select a previously connected server.\r\n";
             // 
             // picASCOM
             // 
@@ -90,9 +90,9 @@ namespace ASCOM.HTTPWeather
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(13, 90);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
+            this.label2.Size = new System.Drawing.Size(38, 13);
             this.label2.TabIndex = 5;
-            this.label2.Text = "Comm Port";
+            this.label2.Text = "Server";
             // 
             // chkTrace
             // 
@@ -104,20 +104,20 @@ namespace ASCOM.HTTPWeather
             this.chkTrace.Text = "Trace on";
             this.chkTrace.UseVisualStyleBackColor = true;
             // 
-            // comboBoxComPort
+            // comboBoxLastServer
             // 
-            this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(77, 87);
-            this.comboBoxComPort.Name = "comboBoxComPort";
-            this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
-            this.comboBoxComPort.TabIndex = 7;
+            this.comboBoxLastServer.FormattingEnabled = true;
+            this.comboBoxLastServer.Location = new System.Drawing.Point(77, 87);
+            this.comboBoxLastServer.Name = "comboBoxLastServer";
+            this.comboBoxLastServer.Size = new System.Drawing.Size(190, 21);
+            this.comboBoxLastServer.TabIndex = 7;
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(350, 175);
-            this.Controls.Add(this.comboBoxComPort);
+            this.Controls.Add(this.comboBoxLastServer);
             this.Controls.Add(this.chkTrace);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.picASCOM);
@@ -145,6 +145,6 @@ namespace ASCOM.HTTPWeather
         private System.Windows.Forms.PictureBox picASCOM;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkTrace;
-        private System.Windows.Forms.ComboBox comboBoxComPort;
+        private System.Windows.Forms.ComboBox comboBoxLastServer;
     }
 }

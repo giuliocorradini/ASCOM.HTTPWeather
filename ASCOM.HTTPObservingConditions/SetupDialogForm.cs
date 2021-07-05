@@ -30,8 +30,17 @@ namespace ASCOM.HTTPWeather
         {
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
-            ObservingConditions.comPort = (string)comboBoxComPort.SelectedItem;
+            if(comboBoxLastServer.SelectedItem != null)
+            {
+                ObservingConditions.LastServer = (string)comboBoxLastServer.SelectedItem;
+            } else if (comboBoxLastServer.Text != "")
+            {
+                comboBoxLastServer.Items.Add(comboBoxLastServer.Text);
+                ObservingConditions.LastServer = (string)comboBoxLastServer.Text;
+            }
             tl.Enabled = chkTrace.Checked;
+
+            tl.LogMessage("SetupDialog", $"Selected item {ObservingConditions.LastServer}");
         }
 
         private void cmdCancel_Click(object sender, EventArgs e) // Cancel button event handler
@@ -60,12 +69,12 @@ namespace ASCOM.HTTPWeather
         {
             chkTrace.Checked = tl.Enabled;
             // set the list of com ports to those that are currently available
-            comboBoxComPort.Items.Clear();
-            comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
+            comboBoxLastServer.Items.Clear();
+            comboBoxLastServer.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
             // select the current port if possible
-            if (comboBoxComPort.Items.Contains(ObservingConditions.comPort))
+            if (comboBoxLastServer.Items.Contains(ObservingConditions.lastServer))
             {
-                comboBoxComPort.SelectedItem = ObservingConditions.comPort;
+                comboBoxLastServer.SelectedItem = ObservingConditions.lastServer;
             }
         }
     }
