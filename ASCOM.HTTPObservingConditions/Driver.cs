@@ -30,6 +30,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Net.Http;
+using System.Text.Json;
 
 
 namespace ASCOM.HTTPWeather
@@ -72,6 +73,9 @@ namespace ASCOM.HTTPWeather
         internal static string lastServer;
 
         static readonly HttpClient client = new HttpClient();
+
+        // Last request deserialized data
+        private WeatherData lastWeatherData;
 
         /// <summary>
         /// Private variable to hold the connected state
@@ -430,7 +434,11 @@ namespace ASCOM.HTTPWeather
         /// </summary>
         public void Refresh()
         {
-            throw new ASCOM.MethodNotImplementedException();
+            string data;
+            if(PerformRequest(out data))
+            {
+                UpdateConditions(data);
+            }
         }
 
         /// <summary>
@@ -547,7 +555,11 @@ namespace ASCOM.HTTPWeather
             {
                 switch (propertyName.Trim().ToLowerInvariant())
                 {
-                    // Return the time for properties that are implemented, otherwise fall through to the MethodNotImplementedException
+                    // Implemented
+                    case "temperature":
+                        return lastWeatherData.Date; //TODO: time.now - last update
+
+                    // Not implemented
                     case "averageperiod":
                     case "cloudcover":
                     case "dewpoint":
@@ -558,13 +570,14 @@ namespace ASCOM.HTTPWeather
                     case "skyquality":
                     case "skytemperature":
                     case "starfwhm":
-                    case "temperature":
                     case "winddirection":
                     case "windgust":
                     case "windspeed":
-                        // Throw an exception on the properties that are not implemented
+                        // Throw an exception
                         LogMessage("TimeSinceLastUpdate", $"Property {propertyName} is not implemented");
                         throw new MethodNotImplementedException($"TimeSinceLastUpdate - Property {propertyName} is not implemented");
+
+                    // Invalid
                     default:
                         LogMessage("TimeSinceLastUpdate", $"Invalid sensor name: {propertyName}");
                         throw new InvalidValueException($"TimeSinceLastUpdate - Invalid property name: {propertyName}");
@@ -572,8 +585,7 @@ namespace ASCOM.HTTPWeather
             }
 
             // Return the time since the most recent update to any sensor
-            LogMessage("TimeSinceLastUpdate", $"The time since the most recent sensor update is not implemented");
-            throw new MethodNotImplementedException("TimeSinceLastUpdate(" + propertyName + ")");
+            return lastWeatherData.Date; //TODO: time.now - last update
         }
 
         /// <summary>
@@ -752,13 +764,50 @@ namespace ASCOM.HTTPWeather
             }
         }
 
+        private bool PerformRequest(out string response)
+        {
+            response = "{}";
+
+            var req_task = client.GetAsync(lastServer);
+            try
+            {
+                req_task.Wait();
+            }
+            catch (AggregateException e)
+            {
+                foreach (Exception ie in e.InnerExceptions)
+                {
+                    LogMessage("HTTP Connection", $"{ie.GetType()} exception: {ie.Message}");
+                }
+                return false;
+            }
+
+            HttpResponseMessage resp = req_task.Result;
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                LogMessage("HTTP Connection", $"Probe request return code: ${resp.StatusCode}. Body: {resp.Content}");
+                return false;
+            }
+
+            response = resp.Content.ToString();
+            return true;
+        }
+
         /// <summary>
         /// Decode JSON formatted string representing conditions and update internal variables.
         /// </summary>
         /// <param name="conditions">JSON formatteed string representing conditions</param>
         private void UpdateConditions(string conditions)
         {
-
+            try
+            {
+                lastWeatherData = JsonSerializer.Deserialize<WeatherData>(conditions);
+            } catch (JsonException e)
+            {
+                LogMessage("JSON parsing", $"Error {e.Message}");
+                return;
+            }
         }
 
         /// <summary>
