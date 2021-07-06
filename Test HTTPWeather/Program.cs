@@ -42,6 +42,19 @@ namespace ASCOM
             device.Connected = true;
 
             Console.WriteLine($"Connection status {device.Connected}");
+            if(device.Connected)
+            {
+                device.Refresh();
+                Console.WriteLine($"Temperature: {device.Temperature}");
+
+                Console.WriteLine($"Last measurement date: {device.TimeSinceLastUpdate("")}");
+
+            }
+            else
+            {
+                Console.WriteLine($"Can't connect to server");
+            }
+
 
             device.Connected = false;
             Console.WriteLine("Press Enter to finish");

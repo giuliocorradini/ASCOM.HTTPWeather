@@ -374,8 +374,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("DewPoint", "get - not implemented");
-                throw new PropertyNotImplementedException("DewPoint", false);
+                return lastWeatherData.DewPoint;
             }
         }
 
@@ -390,8 +389,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("Humidity", "get - not implemented");
-                throw new PropertyNotImplementedException("Humidity", false);
+                return lastWeatherData.Humidity;
             }
         }
 
@@ -407,8 +405,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("Pressure", "get - not implemented");
-                throw new PropertyNotImplementedException("Pressure", false);
+                return lastWeatherData.Barometer;
             }
         }
 
@@ -423,8 +420,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("RainRate", "get - not implemented");
-                throw new PropertyNotImplementedException("RainRate", false);
+                return lastWeatherData.RainRate;
             }
         }
 
@@ -533,8 +529,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("Temperature", "get - not implemented");
-                throw new PropertyNotImplementedException("Temperature", false);
+                return lastWeatherData.OutsideTemperature;
             }
         }
 
@@ -557,22 +552,22 @@ namespace ASCOM.HTTPWeather
                 {
                     // Implemented
                     case "temperature":
-                        return lastWeatherData.Date; //TODO: time.now - last update
-
-                    // Not implemented
-                    case "averageperiod":
-                    case "cloudcover":
                     case "dewpoint":
                     case "humidity":
                     case "pressure":
                     case "rainrate":
+                    case "winddirection":
+                    case "windspeed":
+                        return LastUpdate;
+
+                    // Not implemented
+                    case "averageperiod":
+                    case "cloudcover":
                     case "skybrightness":
                     case "skyquality":
                     case "skytemperature":
                     case "starfwhm":
-                    case "winddirection":
                     case "windgust":
-                    case "windspeed":
                         // Throw an exception
                         LogMessage("TimeSinceLastUpdate", $"Property {propertyName} is not implemented");
                         throw new MethodNotImplementedException($"TimeSinceLastUpdate - Property {propertyName} is not implemented");
@@ -585,7 +580,7 @@ namespace ASCOM.HTTPWeather
             }
 
             // Return the time since the most recent update to any sensor
-            return lastWeatherData.Date; //TODO: time.now - last update
+            return LastUpdate;
         }
 
         /// <summary>
@@ -599,8 +594,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("WindDirection", "get - not implemented");
-                throw new PropertyNotImplementedException("WindDirection", false);
+                return lastWeatherData.WindDirection;
             }
         }
 
@@ -611,8 +605,7 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("WindGust", "get - not implemented");
-                throw new PropertyNotImplementedException("WindGust", false);
+                return lastWeatherData.WindGust;
             }
         }
 
@@ -623,11 +616,17 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                LogMessage("WindSpeed", "get - not implemented");
-                throw new PropertyNotImplementedException("WindSpeed", false);
+                return lastWeatherData.WindSpeed;
             }
         }
 
+        public double LastUpdate
+        {
+            get
+            {
+                return (DateTimeOffset.Now.ToUnixTimeSeconds() - lastWeatherData.Date) / 3600;
+            }
+        }
         #endregion
 
         #region private methods
@@ -790,7 +789,17 @@ namespace ASCOM.HTTPWeather
                 return false;
             }
 
-            response = resp.Content.ToString();
+            var read_str_task = resp.Content.ReadAsStringAsync();
+            try
+            {
+                read_str_task.Wait();
+            }
+            catch (Exception e)
+            {
+                LogMessage("HTTP Stream", $"Error reading response body as stream {e.Message}");
+                return false;
+            }
+            response = read_str_task.Result;
             return true;
         }
 
