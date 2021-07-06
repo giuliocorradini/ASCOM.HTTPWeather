@@ -77,7 +77,7 @@ namespace ASCOM.HTTPWeather
         static readonly HttpClient client = new HttpClient();
 
         // Last request deserialized data
-        private WeatherData lastWeatherData;
+        private WeatherData lastWeatherData = new WeatherData();
 
         /// <summary>
         /// Private variable to hold the connected state
