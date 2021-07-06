@@ -70,7 +70,7 @@ namespace ASCOM.HTTPWeather
             chkTrace.Checked = tl.Enabled;
             // set the list of com ports to those that are currently available
             comboBoxLastServer.Items.Clear();
-            comboBoxLastServer.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
+            comboBoxLastServer.Items.AddRange(ObservingConditions.favouriteServers.ToArray());
             // select the current port if possible
             if (comboBoxLastServer.Items.Contains(ObservingConditions.lastServer))
             {

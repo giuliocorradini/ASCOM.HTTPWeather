@@ -68,9 +68,11 @@ namespace ASCOM.HTTPWeather
         internal static string traceStateDefault = "true";  //TODO: remove in release mode
         internal static string lastServerProfileName = "Last server";
         internal static string lastServerDefault = "http://localhost/weather/json";
+        internal static string favouriteServersProfileName = "Favourite servers";
 
         // Current status variables
         internal static string lastServer;
+        internal static List<string> favouriteServers;
 
         static readonly HttpClient client = new HttpClient();
 
@@ -318,6 +320,9 @@ namespace ASCOM.HTTPWeather
                 if(Uri.TryCreate(value, UriKind.Absolute, out res) && (res.Scheme == Uri.UriSchemeHttp || res.Scheme == Uri.UriSchemeHttps))
                 {
                     lastServer = value;
+                    if(!favouriteServers.Contains(value)) {
+                        favouriteServers.Add(value);
+                    }
                 }
             }
         }
@@ -829,6 +834,18 @@ namespace ASCOM.HTTPWeather
                 driverProfile.DeviceType = "ObservingConditions";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
                 lastServer = driverProfile.GetValue(driverID, lastServerProfileName, string.Empty, lastServerDefault);
+
+                // Load list of fav. servers and unmarshal from JSON
+                var serversJson = driverProfile.GetValue(driverID, favouriteServersProfileName, string.Empty, "[]");
+                try
+                {
+                    favouriteServers = JsonSerializer.Deserialize<List<string>>(serversJson);
+                }
+                catch(Exception e)
+                {
+                    LogMessage("ReadProfile", $"Can't parse favourite servers. {e.Message}");
+                    favouriteServers = new List<string> { };
+                }
             }
         }
 
@@ -842,6 +859,7 @@ namespace ASCOM.HTTPWeather
                 driverProfile.DeviceType = "ObservingConditions";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(driverID, lastServerProfileName, lastServer.ToString());
+                driverProfile.WriteValue(driverID, favouriteServersProfileName, JsonSerializer.Serialize(favouriteServers));
             }
         }
 
