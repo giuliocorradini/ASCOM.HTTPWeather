@@ -10,9 +10,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ASCOM.HTTPWeather.ObservingConditions")]
 [assembly: AssemblyDescription("ASCOM ObservingConditions driver for HTTPWeather")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("The ASCOM Initiative")]
+[assembly: AssemblyCompany("Osservatorio di Cavezzo")]
 [assembly: AssemblyProduct("ASCOM ObservingConditions driver for HTTPWeather")]
-[assembly: AssemblyCopyright("Copyright © 2021 The ASCOM Initiative")]
+[assembly: AssemblyCopyright("Copyright © 2021 Giulio Corradini")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
