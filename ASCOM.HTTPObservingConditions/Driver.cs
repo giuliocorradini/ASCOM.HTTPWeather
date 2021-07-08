@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Net.Http;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 
 namespace ASCOM.HTTPWeather
@@ -625,12 +625,25 @@ namespace ASCOM.HTTPWeather
         {
             get
             {
-                return (DateTimeOffset.Now.ToUnixTimeSeconds() - lastWeatherData.Date) / 3600;
+                return (ToUnixTimeSeconds(DateTime.UtcNow) - lastWeatherData.Date) / 3600;
             }
         }
         #endregion
 
         #region private methods
+
+        /// <summary>
+        /// Convert UtcNow DateTime object to number of seconds since UNIX Epoch Time.
+        /// </summary>
+        /// <param name="d">DateTime.UtcNow object</param>
+        /// <returns></returns>
+        public double ToUnixTimeSeconds(DateTime d)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var span = (d - epoch);
+
+            return span.TotalSeconds;
+        }
 
         #endregion
 
@@ -784,7 +797,7 @@ namespace ASCOM.HTTPWeather
         {
             try
             {
-                lastWeatherData = JsonSerializer.Deserialize<WeatherData>(conditions);
+                lastWeatherData = JsonConvert.DeserializeObject<WeatherData>(conditions);
             } catch (JsonException e)
             {
                 LogMessage("JSON parsing", $"Error {e.Message}");
@@ -807,7 +820,7 @@ namespace ASCOM.HTTPWeather
                 var serversJson = driverProfile.GetValue(driverID, favouriteServersProfileName, string.Empty, "[]");
                 try
                 {
-                    favouriteServers = JsonSerializer.Deserialize<List<string>>(serversJson);
+                    favouriteServers = JsonConvert.DeserializeObject<List<string>>(serversJson);
                 }
                 catch(Exception e)
                 {
@@ -827,7 +840,7 @@ namespace ASCOM.HTTPWeather
                 driverProfile.DeviceType = "ObservingConditions";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(driverID, lastServerProfileName, lastServer.ToString());
-                driverProfile.WriteValue(driverID, favouriteServersProfileName, JsonSerializer.Serialize(favouriteServers));
+                driverProfile.WriteValue(driverID, favouriteServersProfileName, JsonConvert.SerializeObject(favouriteServers));
             }
         }
 
